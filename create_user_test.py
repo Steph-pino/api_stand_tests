@@ -1,6 +1,7 @@
 import sender_stand_request
 import data
 
+
 # Función para cambiar el valor del parámetro firstName en el cuerpo de la solicitud
 def get_user_body(first_name):
     # Copiar el diccionario con el cuerpo de la solicitud desde el archivo de datos
@@ -36,8 +37,6 @@ def positive_assert(first_name):
 def negative_assert_symbol(first_name):
     # El cuerpo de la solicitud actualizada se guarda en la variable user_body
     user_body = get_user_body(first_name)
-
-    # El resultado se guarda en la variable response
     response = sender_stand_request.post_new_user(user_body)
 
     # Comprueba si el código de estado es 400
@@ -46,22 +45,17 @@ def negative_assert_symbol(first_name):
     # Comprueba que el atributo code en el cuerpo de respuesta es 400
     assert response.json()["code"] == 400
     # Comprueba el atributo message en el cuerpo de respuesta
-    assert response.json()["message"] == "El nombre que ingresaste es incorrecto. " \
-                                         "Los nombres solo pueden contener caracteres latinos,  "\
-                                         "los nombres deben tener al menos 2 caracteres y no más de 15 caracteres"
+    assert response.json()["message"] == ("Has introducido un nombre de usuario no válido. "
+                                          "El nombre solo puede contener letras del alfabeto latino, la longitud debe ser de 2 a 15 caracteres.")
+
 
 # Función de prueba negativa cuando el error es "No se enviaron todos los parámetros requeridos"
 def negative_assert_no_firstname(user_body):
     # El resultado se guarda en la variable response
     response = sender_stand_request.post_new_user(user_body)
-
-    # Comprueba si el código de estado es 400
     assert response.status_code == 400
-
-    # Comprueba que el atributo code en el cuerpo de respuesta es 400
     assert response.json()["code"] == 400
-    # Comprueba el atributo message en el cuerpo de respuesta
-    assert response.json()["message"] == "No se enviaron todos los parámetros requeridos"
+    assert response.json()["message"] == "No se han aprobado todos los parámetros requeridos"
 
 # Prueba 1. Usuario o usuaria creada con éxito. El parámetro firstName contiene 2 caracteres
 def test_create_user_2_letter_in_first_name_get_success_response():
@@ -93,11 +87,8 @@ def test_create_user_has_number_in_first_name_get_error_response():
 
 # Prueba 8. Error. Falta el parámetro firstName en la solicitud
 def test_create_user_no_first_name_get_error_response():
-    # El diccionario con el cuerpo de la solicitud se copia del archivo "data" a la variable "user_body"
     user_body = data.user_body.copy()
-    # El parámetro "firstName" se elimina de la solicitud
     user_body.pop("firstName")
-    # Comprueba la respuesta
     negative_assert_no_firstname(user_body)
 
 # Prueba 9. Error. El parámetro contiene un string vacío
